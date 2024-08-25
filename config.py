@@ -1,4 +1,3 @@
-# config.py
 import pygame
 from board import gameBoard
 
@@ -9,13 +8,13 @@ TextPath = "Assets/TextImages/"
 DataPath = "Assets/Data/"
 MusicPath = "Assets/Music/"
 
-# Game Settings
+# jogo Settings
 spriteRatio = 3/2
-square = 25
-spriteOffset = square * (1 - spriteRatio) * (1/2)
+pixel = 25
+spriteOffset = pixel * (1 - spriteRatio) * (1/2)
 pelletColor = (222, 161, 133)
 
-# Game Keys
+# jogo Keys
 PLAYING_KEYS = {
     "up": [pygame.K_w, pygame.K_UP],
     "down": [pygame.K_s, pygame.K_DOWN],
@@ -24,6 +23,7 @@ PLAYING_KEYS = {
 }
 
 # Other Constants
-initial_lives = 3
+vidas_iniciais = 3
 initial_score = 0
-(width, height) = (len(gameBoard[0]) * square, len(gameBoard) * square) # Game screen
+(width, height) = (len(gameBoard[0]) * pixel,
+                   len(gameBoard) * pixel)  # jogo tela

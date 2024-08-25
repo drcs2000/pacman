@@ -1,168 +1,119 @@
-# main.py
-
-# Define se o jogo está na tela de lançamento
-onLaunchScreen = True
-
-import pygame
-from game import Game
+from board import pixel
+from config import TextPath, MusicPath
 import config
-from config import TextPath, MusicPath, spriteRatio
-from board import square
+from game import jogo
+import pygame
+onLaunchScreen = True
 
 pygame.mixer.init()
 pygame.init()
 
-# Screen settings
-screen = pygame.display.set_mode((config.width, config.height))
+# tela settings
+tela = pygame.display.set_mode((config.width, config.height))
 pygame.display.flip()
 
-# Initialize Game
-game = Game(1, config.initial_score, screen)
+# Initialize jogo
+jogo = jogo(1, config.initial_score, tela)
 
-# Main game loop
+# Main jogo loop
 running = True
-clock = pygame.time.Clock()
+relogio = pygame.time.Clock()
 
 PLAYING_KEYS = {
-    "up":[pygame.K_w, pygame.K_UP],
-    "down":[pygame.K_s, pygame.K_DOWN],
-    "right":[pygame.K_d, pygame.K_RIGHT],
-    "left":[pygame.K_a, pygame.K_LEFT]
+    "up": [pygame.K_w, pygame.K_UP],
+    "down": [pygame.K_s, pygame.K_DOWN],
+    "right": [pygame.K_d, pygame.K_RIGHT],
+    "left": [pygame.K_a, pygame.K_LEFT]
 }
 
-def reset_game():
-    global game
-    game = Game(1, config.initial_score, screen)
 
 def displayLaunchScreen():
-    # Draw Pacman Title
-    pacmanTitle = ["tile016.png", "tile000.png", "tile448.png", "tile012.png", "tile000.png", "tile013.png"]
-    for i in range(len(pacmanTitle)):
-        letter = pygame.image.load(TextPath + pacmanTitle[i])
-        letter = pygame.transform.scale(letter, (int(square * 4), int(square * 4)))
-        screen.blit(letter, ((2 + 4 * i) * square, 2 * square, square, square))
+    # Load and display the wallpaper
+    wallpaper = pygame.image.load("wallpaper.jpg")
+    wallpaper = pygame.transform.scale(
+        wallpaper, (config.width, config.height))
+    tela.blit(wallpaper, (0, 0))
 
-    # Draw Character / Nickname
-    characterTitle = [
-        #Character
-        "tile002.png", "tile007.png", "tile000.png", "tile018.png", "tile000.png", "tile002.png", "tile020.png", "tile004.png", "tile018.png",
-        # /
-        "tile015.png", "tile042.png", "tile015.png",
-        # Nickname
-        "tile013.png", "tile008.png", "tile002.png", "tile010.png", "tile013.png", "tile000.png", "tile012.png", "tile004.png"
-    ]
-    for i in range(len(characterTitle)):
-        letter = pygame.image.load(TextPath + characterTitle[i])
-        letter = pygame.transform.scale(letter, (int(square), int(square)))
-        screen.blit(letter, ((4 + i) * square, 10 * square, square, square))
+    # Adjusted scaling for the letters
+    letter_scale = 20
+    title = ["tituloP.png", "snorlax.png", "tituloK.png", "tituloE.png",
+             "espacoTitulo.png", "tituloM.png", "tituloA.png", "tituloN.png"]
+    title_width = len(title) * letter_scale * 4
+    screen_width = config.width
+    start_x = (screen_width - title_width) // 2
 
-    #Draw Characters and their Nickname
-    characters = [
-        # Red Ghost
-        [
-            "tile449.png", "tile015.png", "tile107.png", "tile015.png", "tile083.png", "tile071.png", "tile064.png", "tile067.png", "tile078.png", "tile087.png",
-            "tile015.png", "tile015.png", "tile015.png", "tile015.png",
-            "tile108.png", "tile065.png", "tile075.png", "tile072.png", "tile077.png", "tile074.png", "tile089.png", "tile108.png"
-        ],
-        # Pink Ghost
-        [
-            "tile450.png", "tile015.png", "tile363.png", "tile015.png", "tile339.png", "tile336.png", "tile324.png", "tile324.png", "tile323.png", "tile345.png",
-            "tile015.png", "tile015.png", "tile015.png", "tile015.png",
-            "tile364.png", "tile336.png", "tile328.png", "tile333.png", "tile330.png", "tile345.png", "tile364.png"
-        ],
-        # Blue Ghost
-        [
-            "tile452.png", "tile015.png", "tile363.png", "tile015.png", "tile193.png", "tile192.png", "tile211.png", "tile199.png", "tile197.png", "tile213.png", "tile203.png",
-            "tile015.png", "tile015.png", "tile015.png",
-            "tile236.png", "tile200.png", "tile205.png", "tile202.png", "tile217.png", "tile236.png"
-        ],
-        # Orange Ghost
-        [
-            "tile451.png", "tile015.png", "tile363.png", "tile015.png", "tile272.png", "tile270.png", "tile266.png", "tile260.png", "tile281.png",
-            "tile015.png", "tile015.png", "tile015.png", "tile015.png", "tile015.png",
-            "tile300.png", "tile258.png", "tile267.png", "tile281.png", "tile259.png", "tile260.png", "tile300.png"
-        ]
-    ]
-    for i in range(len(characters)):
-        for j in range(len(characters[i])):
-            if j == 0:
-                    letter = pygame.image.load(TextPath + characters[i][j])
-                    letter = pygame.transform.scale(letter, (int(square * spriteRatio), int(square * spriteRatio)))
-                    screen.blit(letter, ((2 + j) * square - square//2, (12 + 2 * i) * square - square//3, square, square))
-            else:
-                letter = pygame.image.load(TextPath + characters[i][j])
-                letter = pygame.transform.scale(letter, (int(square), int(square)))
-                screen.blit(letter, ((2 + j) * square, (12 + 2 * i) * square, square, square))
-    # Draw Pacman and Ghosts
-    event = ["tile449.png", "tile015.png", "tile452.png", "tile015.png",  "tile015.png", "tile448.png", "tile453.png", "tile015.png", "tile015.png", "tile015.png",  "tile453.png"]
-    for i in range(len(event)):
-        character = pygame.image.load(TextPath + event[i])
-        character = pygame.transform.scale(character, (int(square * 2), int(square * 2)))
-        screen.blit(character, ((4 + i * 2) * square, 24 * square, square, square))
-    # Draw PlatForm from Pacman and Ghosts
-    wall = ["tile454.png", "tile454.png", "tile454.png", "tile454.png", "tile454.png", "tile454.png", "tile454.png", "tile454.png", "tile454.png", "tile454.png", "tile454.png", "tile454.png", "tile454.png", "tile454.png", "tile454.png"]
-    for i in range(len(wall)):
-        platform = pygame.image.load(TextPath + wall[i])
-        platform = pygame.transform.scale(platform, (int(square * 2), int(square * 2)))
-        screen.blit(platform, ((i * 2) * square, 26 * square, square, square))
-    # Credit myself
-    credit = ["tile003.png", "tile004.png", "tile022.png", "tile008.png", "tile013.png", "tile015.png", "tile011.png", "tile004.png", "tile000.png", "tile012.png", "tile025.png", "tile015.png", "tile418.png", "tile416.png", "tile418.png", "tile416.png"]
-    for i in range(len(credit)):
-        letter = pygame.image.load(TextPath + credit[i])
-        letter = pygame.transform.scale(letter, (int(square), int(square)))
-        screen.blit(letter, ((6 + i) * square, 30 * square, square, square))
-    # Press Space to Play
-    instructions = ["tile016.png", "tile018.png", "tile004.png", "tile019.png", "tile019.png", "tile015.png", "tile019.png", "tile016.png", "tile000.png", "tile002.png", "tile004.png", "tile015.png", "tile020.png", "tile014.png", "tile015.png", "tile016.png", "tile011.png", "tile000.png", "tile025.png"]
+    # Draw the title centered on the tela
+    for i, part in enumerate(title):
+        letter = pygame.image.load(TextPath + part)
+        letter = pygame.transform.scale(
+            letter, (int(letter_scale * 4), int(letter_scale * 4)))
+        tela.blit(letter, (start_x + (4 * i * letter_scale),
+                           2 * letter_scale, letter_scale, letter_scale))
+
+    # Centering "Press Space to Play"
+    instructions = ["tituloA.png", "tituloP.png", "tituloE.png", "tituloR.png", "tituloT.png", "tituloE.png", "espacoTitulo.png", "tituloE.png", "tituloS.png", "tituloP.png",
+                    "tituloA.png", "tituloC.png", "tituloO.png", "espacoTitulo.png", "tituloP.png", "tituloA.png", "tituloR.png", "tituloA.png", "espacoTitulo.png", "tituloJ.png",
+                    "tituloO.png", "tituloG.png", "tituloA.png", "tituloR.png"]
+
+    instructions_width = len(instructions) * pixel
+    start_x_instructions = (screen_width - instructions_width) // 2
+    # Vertically center it in the tela
+    start_y_instructions = (config.height // 2)
+
     for i in range(len(instructions)):
         letter = pygame.image.load(TextPath + instructions[i])
-        letter = pygame.transform.scale(letter, (int(square), int(square)))
-        screen.blit(letter, ((4.5 + i) * square, 35 * square - 10, square, square))
+        letter = pygame.transform.scale(letter, (int(pixel), int(pixel)))
+        tela.blit(letter, (start_x_instructions + i * pixel,
+                           start_y_instructions, pixel, pixel))
 
     pygame.display.update()
+
 
 running = True
 onLaunchScreen = True
 displayLaunchScreen()
-clock = pygame.time.Clock()
+relogio = pygame.time.Clock()
+
 
 def pause(time):
     cur = 0
     while not cur == time:
         cur += 1
 
+
 while running:
-    clock.tick(40)
+    relogio.tick(40)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-            game.recordHighScore()
+            jogo.recordHighScore()
         elif event.type == pygame.KEYDOWN:
-            game.paused = False
-            game.started = True
+            jogo.pause = False
+            jogo.comecou = True
             if event.key in PLAYING_KEYS["up"]:
                 if not onLaunchScreen:
-                    game.pacman.newDir = 0
+                    jogo.pacman.novaDirecao = 0
             elif event.key in PLAYING_KEYS["right"]:
                 if not onLaunchScreen:
-                    game.pacman.newDir = 1
+                    jogo.pacman.novaDirecao = 1
             elif event.key in PLAYING_KEYS["down"]:
                 if not onLaunchScreen:
-                    game.pacman.newDir = 2
+                    jogo.pacman.novaDirecao = 2
             elif event.key in PLAYING_KEYS["left"]:
                 if not onLaunchScreen:
-                    game.pacman.newDir = 3
+                    jogo.pacman.novaDirecao = 3
             elif event.key == pygame.K_SPACE:
                 if onLaunchScreen:
                     onLaunchScreen = False
-                    game.paused = True
-                    game.started = False
-                    game.render()
-                    pygame.mixer.music.load(MusicPath + "pacman_beginning.wav")
+                    jogo.pause = True
+                    jogo.comecou = False
+                    jogo.render()
+                    pygame.mixer.music.load(MusicPath + "apita_o_arbitro.wav")
                     pygame.mixer.music.play()
-                    musicPlaying = 1
+                    musicaTocando = 1
             elif event.key == pygame.K_q:
                 running = False
-                game.recordHighScore()
+                jogo.recordHighScore()
 
     if not onLaunchScreen:
-        game.update()
+        jogo.update()
