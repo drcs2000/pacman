@@ -230,20 +230,38 @@ class Ghost:
         return math.sqrt((dR * dR) + (dC * dC))  # Retorna a distância euclidiana
 
     def definirAlvo(self):
-        # Define o alvo do fantasma
         if gameBoard[int(self.row)][int(self.col)] == 4 and not self.morto:
-            # Se o fantasma não está morto e está no ghostGate, ele tenta sair
             self.alvo = [self.ghostGate[0][0] - 1, self.ghostGate[0][1] + 1]
             return
         elif gameBoard[int(self.row)][int(self.col)] == 4 and self.morto:
-            # Se o fantasma está morto e no ghostGate, ele permanece lá até reviver
             self.alvo = [self.row, self.col]
         elif self.morto:
-            # Se o fantasma está morto, ele se move em direção ao ghostGate
             self.alvo = [14, 13]
             return
 
-        # Lógica para dispersar os fantasmas em diferentes quadrantes
+        # Lógica especial para Charizard
+        if self.nome == "charizard":
+            pacman_row, pacman_col = self.jogo.pacman.row, self.jogo.pacman.col
+
+            # Calcular a diferença de posição entre Charizard e Pacman
+            diff_row = pacman_row - self.row
+            diff_col = pacman_col - self.col
+
+            # Escolher a direção com a maior distância
+            if abs(diff_row) > abs(diff_col):
+                if diff_row > 0:
+                    self.alvo = [pacman_row - 1, pacman_col]  # Move para cima
+                else:
+                    self.alvo = [pacman_row + 1, pacman_col]  # Move para baixo
+            else:
+                if diff_col > 0:
+                    self.alvo = [pacman_row, pacman_col - 1]  # Move para a esquerda
+                else:
+                    self.alvo = [pacman_row, pacman_col + 1]  # Move para a direita
+
+            return
+
+        # Lógica padrão para os outros fantasmas
         quads = [0, 0, 0, 0]
         for fantasma in self.jogo.criar_fantasma():
             if fantasma.alvo[0] <= 15 and fantasma.alvo[1] >= 13:
@@ -255,7 +273,6 @@ class Ghost:
             elif fantasma.alvo[0] > 15 and fantasma.alvo[1] >= 13:
                 quads[3] += 1
 
-        # Seleciona um novo alvo aleatório até encontrar um válido
         while True:
             self.alvo = [randrange(31), randrange(28)]
             quad = 0
