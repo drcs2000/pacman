@@ -1,40 +1,24 @@
 import os
 
-def rename_files_in_folder(folder_path):
-    # Ensure the folder exists
-    if not os.path.exists(folder_path):
-        print(f"The folder {folder_path} does not exist.")
-        return
+def rename_tile_to_board(folder_path):
+    # Lista todos os arquivos na pasta
+    files = os.listdir(folder_path)
     
-    # Get all files in the folder
-    files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
-    
-    # Sort files to rename them in the right order
-    files.sort()
-
-    # Initialize the counter
-    counter = 0
-
-    # Rename each file
+    # Loop através dos arquivos e renomeia cada um
     for filename in files:
-        # Construct the new filename
-        new_filename = f"score{counter}.png"  # Assuming the files are all .png format
+        # Verifica se "tile" está no nome do arquivo
+        if "tile" in filename:
+            # Substitui "tile" por "board"
+            new_name = filename.replace("tile", "board")
+            
+            # Caminhos completos
+            old_file_path = os.path.join(folder_path, filename)
+            new_file_path = os.path.join(folder_path, new_name)
+            
+            # Renomeia o arquivo
+            os.rename(old_file_path, new_file_path)
+            print(f"{filename} renomeado para {new_name}")
 
-        # Construct full file paths
-        old_file_path = os.path.join(folder_path, filename)
-        new_file_path = os.path.join(folder_path, new_filename)
-
-        # Rename the file
-        os.rename(old_file_path, new_file_path)
-        print(f"Renamed {filename} to {new_filename}")
-
-        # Increment the counter
-        counter += 1
-
-        # If counter exceeds 9, stop renaming
-        if counter > 9:
-            break
-
-# Example usage
-folder_path = "Assets/newFiles"
-rename_files_in_folder(folder_path)
+# Exemplo de uso
+folder_path = "Assets/BoardImages"
+rename_tile_to_board(folder_path)
