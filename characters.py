@@ -7,9 +7,6 @@ from random import randrange
 from board import gameBoard
 from typing import List
 
-# Classe que representa o Pacman no jogo
-
-
 class Pacman:
     def __init__(self, row, col, jogo):
         # Inicializa o Pacman com a linha e coluna iniciais, referência ao jogo, 
@@ -248,7 +245,7 @@ class Ghost:
             diff_col = pacman_col - self.col
 
             # Escolher a direção com a maior distância
-            if abs(diff_row) > abs(diff_col):
+            if diff_row > diff_col:
                 if diff_row > 0:
                     self.alvo = [pacman_row - 1, pacman_col]  # Move para cima
                 else:
@@ -262,31 +259,31 @@ class Ghost:
             return
 
         # Lógica padrão para os outros fantasmas
-        quads = [0, 0, 0, 0]
+        quadrantes = [0, 0, 0, 0]
         for fantasma in self.jogo.criar_fantasma():
             if fantasma.alvo[0] <= 15 and fantasma.alvo[1] >= 13:
-                quads[0] += 1
+                quadrantes[0] += 1
             elif fantasma.alvo[0] <= 15 and fantasma.alvo[1] < 13:
-                quads[1] += 1
+                quadrantes[1] += 1
             elif fantasma.alvo[0] > 15 and fantasma.alvo[1] < 13:
-                quads[2] += 1
+                quadrantes[2] += 1
             elif fantasma.alvo[0] > 15 and fantasma.alvo[1] >= 13:
-                quads[3] += 1
+                quadrantes[3] += 1
 
         while True:
             self.alvo = [randrange(31), randrange(28)]
-            quad = 0
+            quadrante = 0
             if self.alvo[0] <= 15 and self.alvo[1] >= 13:
-                quad = 0
+                quadrante = 0
             elif self.alvo[0] <= 15 and self.alvo[1] < 13:
-                quad = 1
+                quadrante = 1
             elif self.alvo[0] > 15 and self.alvo[1] < 13:
-                quad = 2
+                quadrante = 2
             elif self.alvo[0] > 15 and self.alvo[1] >= 13:
-                quad = 3
+                quadrante = 3
             if not gameBoard[self.alvo[0]][self.alvo[1]] == 3 and not gameBoard[self.alvo[0]][self.alvo[1]] == 4:
                 break
-            elif quads[quad] == 0:
+            elif quadrantes[quadrante] == 0:
                 break
 
     def valido(self, cRow, cCol):
